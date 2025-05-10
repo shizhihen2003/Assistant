@@ -49,6 +49,13 @@ class ClassroomViewModel: ObservableObject {
     
     // 初始化
     init() {
+        print("ClassroomViewModel初始化...")
+        
+        // 加载上次使用的主机索引
+        let lastHostIndex = UserDefaults.standard.integer(forKey: Constants.UserDefaultsKey.lastHostIndex)
+        NetworkService.shared.setHost(index: lastHostIndex)
+        print("设置教务系统主机索引为: \(lastHostIndex)")
+        
         // 设置默认学期
         if !terms.isEmpty {
             selectedTerm = terms[0]
@@ -74,19 +81,22 @@ class ClassroomViewModel: ObservableObject {
         // 加载上次选择的校区
         loadLastSelectedOptions()
         
-        // 验证登录状态
-        Task {
-            let isSessionValid = await classroomService.validateSession()
-            await MainActor.run {
-                if !isSessionValid {
-                    self.needLogin = true
-                    self.errorMessage = "登录状态已失效，请重新登录"
-                    self.showError = true
-                } else {
-                    print("登录状态有效，无需重新登录")
-                    // 加载服务器数据
-                    Task {
-                        await self.loadServerData()
+        // 延迟验证登录状态和加载服务器数据
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            Task {
+                // 确保验证时使用正确的主机
+                let isSessionValid = await self.classroomService.validateSession()
+                await MainActor.run {
+                    if !isSessionValid {
+                        self.needLogin = true
+                        self.errorMessage = "登录状态已失效，请重新登录"
+                        self.showError = true
+                    } else {
+                        print("登录状态有效，准备加载教室数据")
+                        // 加载服务器数据
+                        Task {
+                            await self.loadServerData()
+                        }
                     }
                 }
             }
