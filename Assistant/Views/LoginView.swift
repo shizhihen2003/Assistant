@@ -28,7 +28,7 @@ struct LoginView: View {
                             .foregroundColor(.blue)
                             .padding(.bottom, 8)
                         
-                        Text("济南大学教务助手")
+                        Text("荆楚理工学院教务助手")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                         
@@ -114,7 +114,7 @@ struct LoginView: View {
                     
                     // 底部版权信息
                     VStack(spacing: 5) {
-                        Text("济南大学教务助手")
+                        Text("荆楚理工学院教务助手")
                             .font(.footnote)
                             .foregroundColor(.secondary)
                         
