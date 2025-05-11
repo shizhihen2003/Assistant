@@ -160,9 +160,27 @@ class NetworkService {
     
     // 清除所有Cookie
     func clearCookies() {
+        // 清除内存中的cookies
         self.cookies = []
+        
+        // 清除UserDefaults中保存的cookies
         UserDefaults.standard.removeObject(forKey: cookieStorageKey)
         UserDefaults.standard.synchronize() // 强制立即保存
+        
+        // 清除系统HTTPCookieStorage中的cookies
+        if let cookieStorage = HTTPCookieStorage.shared.cookies {
+            for cookie in cookieStorage {
+                // 只删除与当前主机相关的cookie
+                let domain = cookie.domain
+                // 检查域名是否匹配（忽略大小写）
+                if domain.lowercased().contains(currentHost.lowercased()) ||
+                   currentHost.lowercased().contains(domain.lowercased()) {
+                    HTTPCookieStorage.shared.deleteCookie(cookie)
+                    print("已删除系统Cookie: \(cookie.name) 域名: \(domain)")
+                }
+            }
+        }
+        
         print("已清除全部Cookie并从存储中移除")
     }
     

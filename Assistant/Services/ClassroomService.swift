@@ -69,7 +69,7 @@ class ClassroomService {
             }
             
             // 获取HTML页面
-            let html = try await NetworkService.shared.getHtml(path: "jwglxt/cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
+            let html = try await NetworkService.shared.getHtml(path: "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
             
             // 从HTML中提取学年学期选项 - 使用正则表达式
             let pattern = "<option[^>]*value=['\"]([0-9]+-(?:3|12))['\"][^>]*>([^<]+)</option>"
@@ -141,7 +141,7 @@ class ClassroomService {
             }
             
             // 获取HTML页面
-            let html = try await NetworkService.shared.getHtml(path: "jwglxt/cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
+            let html = try await NetworkService.shared.getHtml(path: "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
             
             // 从HTML中提取校区选项 - 使用正则表达式
             let pattern = "<option[^>]*value=['\"]([^'\"]+)['\"][^>]*>([^<]+)</option>"
@@ -319,7 +319,7 @@ class ClassroomService {
             }
             
             // 构造请求URL和参数
-            let path = "jwglxt/cdjy/cdjy_cxXqjc.html?gnmkdm=N2155"
+            let path = "cdjy/cdjy_cxXqjc.html?gnmkdm=N2155"
             let params: [String: Any] = ["xqh_id": campusId]
             
             // 设置请求头
@@ -381,7 +381,7 @@ class ClassroomService {
     // 从HTML获取教学楼数据的辅助方法
     private func getBuildingsFromHtml(campusId: String) async throws -> [Building] {
         // 获取HTML页面
-        let html = try await NetworkService.shared.getHtml(path: "jwglxt/cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
+        let html = try await NetworkService.shared.getHtml(path: "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
         
         // 从HTML中提取教学楼选项 - 使用正则表达式
         let pattern = "<option[^>]*value=['\"]([^'\"]+)['\"][^>]*>([^<]+)</option>"
@@ -458,7 +458,7 @@ class ClassroomService {
             }
             
             // 获取HTML页面
-            let html = try await NetworkService.shared.getHtml(path: "jwglxt/cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
+            let html = try await NetworkService.shared.getHtml(path: "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
             
             // 从HTML中提取场地类别选项 - 使用正则表达式
             let pattern = "<option[^>]*value=['\"]([^'\"]+)['\"][^>]*>([^<]+)</option>"

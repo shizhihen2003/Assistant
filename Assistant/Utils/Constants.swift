@@ -11,33 +11,20 @@ struct Constants {
     // API基础配置
     struct API {
         static let eaHosts = [
-//            "jwglxt.jcut.edu.cn",
-            "jwgl.ujn.edu.cn",
-            "jwgl2.ujn.edu.cn",
-            "jwgl3.ujn.edu.cn",
-            "jwgl4.ujn.edu.cn",
-            "jwgl5.ujn.edu.cn",
-            "jwgl6.ujn.edu.cn",
-            "jwgl7.ujn.edu.cn",
-            "jwgl8.ujn.edu.cn",
-            "jwgl9.ujn.edu.cn"
+            "jwglxt.jcut.edu.cn"
         ]
         
-        static let scheme = "http"
+        static let scheme = "https"
         
         // 教务系统登录相关
-        static let eaLoginPath = "jwglxt/xtgl/login_slogin.html"
-//        static let eaLoginPath = "xtgl/login_slogin.html"
-        static let eaLoginPublicKeyPath = "jwglxt/xtgl/login_getPublicKey.html"
-//        static let eaLoginPublicKeyPath = "xtgl/login_getPublicKey.html"
+        static let eaLoginPath = "xtgl/login_slogin.html"
+        static let eaLoginPublicKeyPath = "xtgl/login_getPublicKey.html"
         
         // 空教室查询
-        static let emptyClassroomPath = "jwglxt/cdjy/cdjy_cxKxcdlb.html?doType=query&gnmkdm=N2155"
-//        static let emptyClassroomPath = "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155&layout=default"
+        static let emptyClassroomPath = "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155&layout=default"
         
         // 查询学生信息
-        static let studentInfoPath = "jwglxt/xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801"
-//        static let studentInfoPath = "xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801"
+        static let studentInfoPath = "xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801"
     }
     
     // 预设选项数据
