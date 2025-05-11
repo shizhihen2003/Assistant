@@ -21,7 +21,7 @@ struct Constants {
         static let eaLoginPublicKeyPath = "xtgl/login_getPublicKey.html"
         
         // 空教室查询
-        static let emptyClassroomPath = "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155&layout=default"
+        static let emptyClassroomPath = "cdjy/cdjy_cxKxcdlb.html?doType=query&gnmkdm=N2155"
         
         // 查询学生信息
         static let studentInfoPath = "xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801"
@@ -31,19 +31,35 @@ struct Constants {
     struct OptionData {
         // 校区选项
         static let campuses = [
-            Campus(id: "1", name: "主校区"),
-            Campus(id: "3", name: "明水校区"),
-            Campus(id: "2", name: "舜耕校区")
+            Campus(id: "00002", name: "荆楚理工学院(主校区)"),
+            Campus(id: "00005", name: "实习医院")
         ]
         
         // 场地类别选项
         static let roomTypes = [
             RoomType(id: "", name: "全部"),
-            RoomType(id: "008", name: "多媒体教室"),
-            RoomType(id: "003", name: "普通教室"),
-            RoomType(id: "011", name: "机房"),
-            RoomType(id: "014", name: "实验室"),
-            RoomType(id: "CED9C1E9C6AF41DEE0530AFDA8C0A999", name: "智慧教室")
+            RoomType(id: "00048", name: "排练室"),
+            RoomType(id: "2091D11FAF619542E063B100A8C0A9FD", name: "书法教室"),
+            RoomType(id: "00041", name: "语音室1"),
+            RoomType(id: "00022", name: "练功房"),
+            RoomType(id: "00038", name: "计算机教室"),
+            RoomType(id: "00040", name: "田径场"),
+            RoomType(id: "00042", name: "练功房1"),
+            RoomType(id: "00018", name: "计算机房"),
+            RoomType(id: "00045", name: "画室"),
+            RoomType(id: "00039", name: "多媒体教室1"),
+            RoomType(id: "00046", name: "其它"),
+            RoomType(id: "00024", name: "实验室"),
+            RoomType(id: "00025", name: "画室1"),
+            RoomType(id: "00019", name: "多媒体教室"),
+            RoomType(id: "00017", name: "琴房"),
+            RoomType(id: "00044", name: "实验室1"),
+            RoomType(id: "00047", name: "艺-阶梯教室"),
+            RoomType(id: "00016", name: "普通教室"),
+            RoomType(id: "00021", name: "语音室"),
+            RoomType(id: "AEB160EE2A2235ECE0533C00A8C088D9", name: "工训教室"),
+            RoomType(id: "AEB160EE2A2535ECE0533C00A8C088D9", name: "艺术设计教室"),
+            RoomType(id: "00036", name: "普通固定教室")
         ]
         
         // 学年学期默认选项
@@ -116,29 +132,41 @@ struct Constants {
             Period(id: "10", name: "第10节")
         ]
         
-        // 主校区默认教学楼
+        // 主校区默认教学楼（荆楚理工学院校区）
         static let mainCampusBuildings = [
             Building(id: "", name: "全部"),
-            Building(id: "0004", name: "第一教学楼"),
-            Building(id: "0002", name: "第四教学楼"),
-            Building(id: "0003", name: "第三教学楼"),
-            Building(id: "0007", name: "第二教学楼"),
-            Building(id: "0016", name: "第五教学楼"),
-            Building(id: "0006", name: "第十教学楼"),
-            Building(id: "0011", name: "第八教学楼")
+            Building(id: "00040", name: "02-00实验楼"),
+            Building(id: "00010", name: "02-01教学楼B栋"),
+            Building(id: "00011", name: "02-02教学楼A栋"),
+            Building(id: "00051", name: "02-03教学楼C栋"),
+            Building(id: "00013", name: "02-04教学楼D栋"),
+            Building(id: "00030", name: "02-07田径场"),
+            Building(id: "00042", name: "02-08工训楼G栋"),
+            Building(id: "00043", name: "02-09四合院"),
+            Building(id: "00045", name: "02-10工业训练中心"),
+            Building(id: "00046", name: "02-11理工实验楼A栋"),
+            Building(id: "00047", name: "02-12理工实验楼B栋"),
+            Building(id: "00052", name: "02-13旧图书馆"),
+            Building(id: "00053", name: "02-14解剖实验楼"),
+            Building(id: "00054", name: "02-15医训楼"),
+            Building(id: "00048", name: "2-13新图书馆"),
+            Building(id: "00055", name: "博物馆办公楼"),
+            Building(id: "00041", name: "金工实习工厂"),
+            Building(id: "00049", name: "图书馆钟楼"),
+            Building(id: "00014", name: "行政楼B栋"),
+            Building(id: "00044", name: "艺术中心"),
+            Building(id: "wlh", name: "无楼号")
         ]
         
-        // 舜耕校区默认教学楼
+        // 其他校区默认教学楼 (实习医院校区)
         static let shungengCampusBuildings = [
-            Building(id: "", name: "全部"),
-            Building(id: "0010", name: "第七教学楼"),
-            Building(id: "0023", name: "第九教学楼")
+            Building(id: "", name: "全部")
+            // 实习医院可能没有默认教学楼，但保留结构
         ]
         
-        // 明水校区默认教学楼
+        // 保留原始结构，虽然现在只有两个校区
         static let mingshuiCampusBuildings = [
-            Building(id: "", name: "全部"),
-            Building(id: "0008", name: "第十一教学楼")
+            Building(id: "", name: "全部")
         ]
     }
     

@@ -55,12 +55,37 @@ class ClassroomViewModel: ObservableObject {
         NetworkService.shared.setHost(index: lastHostIndex)
         print("设置教务系统主机索引为: \(lastHostIndex)")
         
+        // 加载默认预设数据 - 优先使用静态数据加快显示
+        self.campusList = Constants.OptionData.campuses
+        self.buildings = Constants.OptionData.mainCampusBuildings
+        self.roomTypes = Constants.OptionData.roomTypes
+        
         // 设置默认学期
         if !terms.isEmpty {
             selectedTerm = terms[0]
         } else {
             // 如果terms为空，确保selectedTerm有默认值
             selectedTerm = Constants.OptionData.defaultTerms()[0]
+        }
+        
+        // 设置默认校区（如果有上次选择的，优先使用）
+        if let lastCampusId = UserDefaults.standard.string(forKey: Constants.UserDefaultsKey.lastCampusId),
+           let campus = self.campusList.first(where: { $0.id == lastCampusId }) {
+            selectedCampus = campus
+        } else if !self.campusList.isEmpty {
+            selectedCampus = self.campusList[0]
+        }
+        
+        // 设置默认教学楼
+        if !self.buildings.isEmpty {
+            selectedBuilding = self.buildings[0]
+        }
+        
+        // 设置默认场地类别（优先选择多媒体教室）
+        if let multimediaType = self.roomTypes.first(where: { $0.id == "00019" }) {
+            selectedRoomType = multimediaType
+        } else if !self.roomTypes.isEmpty {
+            selectedRoomType = self.roomTypes[0]
         }
         
         // 设置默认周次为当前周
@@ -177,16 +202,23 @@ class ClassroomViewModel: ObservableObject {
             let serverCampuses = await classroomService.getCampusOptions()
             if !serverCampuses.isEmpty {
                 await MainActor.run {
-                    // 更新校区列表
-                    self.campusList = serverCampuses
+                    // 比较服务器返回的校区数据与预设数据是否一致
+                    let isSameData = compareCampusArrays(serverCampuses, Constants.OptionData.campuses)
                     
-                    // 如果有上次选择的校区，尝试恢复
-                    if let lastCampusId = UserDefaults.standard.string(forKey: Constants.UserDefaultsKey.lastCampusId),
-                       let campus = self.campusList.first(where: { $0.id == lastCampusId }) {
-                        self.selectedCampus = campus
-                    } else if !self.campusList.isEmpty {
-                        // 否则选择第一个
-                        self.selectedCampus = self.campusList[0]
+                    if !isSameData {
+                        print("服务器返回的校区数据与预设不一致，使用服务器数据")
+                        // 不一致，使用服务器数据
+                        self.campusList = serverCampuses
+                        
+                        // 重新设置选中的校区
+                        if let lastCampusId = UserDefaults.standard.string(forKey: Constants.UserDefaultsKey.lastCampusId),
+                           let campus = self.campusList.first(where: { $0.id == lastCampusId }) {
+                            self.selectedCampus = campus
+                        } else if !self.campusList.isEmpty {
+                            self.selectedCampus = self.campusList[0]
+                        }
+                    } else {
+                        print("服务器返回的校区数据与预设一致，保持使用预设数据")
                     }
                 }
             }
@@ -195,25 +227,59 @@ class ClassroomViewModel: ObservableObject {
         }
     }
     
+    // 比较两个校区数组是否相同
+    private func compareCampusArrays(_ array1: [Campus], _ array2: [Campus]) -> Bool {
+        guard array1.count == array2.count else { return false }
+        
+        for i in 0..<array1.count {
+            if array1[i].id != array2[i].id || array1[i].name != array2[i].name {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
     // 加载场地类别数据
     private func loadRoomTypes() async {
         do {
             let serverRoomTypes = await classroomService.getRoomTypeOptions()
             if !serverRoomTypes.isEmpty {
                 await MainActor.run {
-                    self.roomTypes = serverRoomTypes
+                    // 比较服务器返回的场地类别与预设数据是否一致
+                    let isSameData = compareRoomTypeArrays(serverRoomTypes, Constants.OptionData.roomTypes)
                     
-                    // 默认选择多媒体教室或第一个选项
-                    if let multimediaType = self.roomTypes.first(where: { $0.id == "008" }) {
-                        self.selectedRoomType = multimediaType
-                    } else if !self.roomTypes.isEmpty {
-                        self.selectedRoomType = self.roomTypes[0]
+                    if !isSameData {
+                        print("服务器返回的场地类别与预设不一致，使用服务器数据")
+                        self.roomTypes = serverRoomTypes
+                        
+                        // 重新设置选中的场地类别，优先选择多媒体教室
+                        if let multimediaType = self.roomTypes.first(where: { $0.id == "00019" }) {
+                            self.selectedRoomType = multimediaType
+                        } else if !self.roomTypes.isEmpty {
+                            self.selectedRoomType = self.roomTypes[0]
+                        }
+                    } else {
+                        print("服务器返回的场地类别与预设一致，保持使用预设数据")
                     }
                 }
             }
         } catch {
             print("加载场地类别数据失败: \(error)")
         }
+    }
+    
+    // 比较两个场地类别数组是否相同
+    private func compareRoomTypeArrays(_ array1: [RoomType], _ array2: [RoomType]) -> Bool {
+        guard array1.count == array2.count else { return false }
+        
+        for i in 0..<array1.count {
+            if array1[i].id != array2[i].id || array1[i].name != array2[i].name {
+                return false
+            }
+        }
+        
+        return true
     }
     
     // 从缓存加载教学楼数据
@@ -263,65 +329,55 @@ class ClassroomViewModel: ObservableObject {
     
     // 根据校区加载教学楼
     func loadBuildingsForCampus(campusId: String) async {
-        // 首先尝试从缓存加载
-        if let cachedBuildings = loadBuildingsFromCache(campusId: campusId) {
-            // 使用缓存数据更新UI
-            await MainActor.run {
-                self.buildings = cachedBuildings
-                // 确保选中的教学楼仍然存在于新的列表中
-                if !self.buildings.contains(where: { $0.id == self.selectedBuilding.id }) {
+        // 首先使用预设数据，加快显示速度
+        let defaultBuildings = getDefaultBuildings(forCampus: campusId)
+        await MainActor.run {
+            self.buildings = defaultBuildings
+            // 确保选中的教学楼有默认值
+            if self.buildings.isEmpty || !self.buildings.contains(where: { $0.id == self.selectedBuilding.id }) {
+                if !self.buildings.isEmpty {
                     self.selectedBuilding = self.buildings[0]
                 }
             }
-            print("已从缓存加载校区\(campusId)的教学楼数据")
-        } else {
-            // 如果没有缓存，使用默认数据并显示加载中状态
-            let defaultBuildings = getDefaultBuildings(forCampus: campusId)
-            await MainActor.run {
-                self.buildings = defaultBuildings
-                self.selectedBuilding = self.buildings[0]
-            }
-            print("未找到缓存，使用默认教学楼数据")
         }
         
-        // 无论是否有缓存，都异步请求最新数据
+        // 异步请求服务器数据
         do {
             // 从API获取教学楼数据
-            let apiBuildings = try await classroomService.getBuildingOptions(campusId: campusId)
+            let apiBuildings = await classroomService.getBuildingOptions(campusId: campusId)
             
             // 检查新获取的数据与当前显示的数据是否相同
             await MainActor.run {
-                if !areBuildingsArraysEqual(apiBuildings, self.buildings) {
-                    print("从服务器获取的教学楼数据与当前显示不同，更新UI")
+                let isSameData = areBuildingsArraysEqual(apiBuildings, self.buildings)
+                
+                if !isSameData {
+                    print("从服务器获取的教学楼数据与预设不一致，更新UI")
                     self.buildings = apiBuildings
                     // 确保选中的教学楼仍然存在于新的列表中
                     if !self.buildings.contains(where: { $0.id == self.selectedBuilding.id }) {
                         self.selectedBuilding = self.buildings[0]
                     }
                 } else {
-                    print("从服务器获取的教学楼数据与当前显示相同，不更新UI")
+                    print("从服务器获取的教学楼数据与预设一致，不更新UI")
                 }
             }
             
-            // 无论是否更新UI，都保存最新数据到缓存
+            // 保存最新数据到缓存
             saveBuildingsToCache(buildings: apiBuildings, campusId: campusId)
             
         } catch {
             print("从服务器加载教学楼失败: \(error)")
-            // 如果服务器请求失败，但已经有缓存数据，则保持使用缓存数据
-            // 如果既没有缓存也请求失败，则已经使用了默认值
         }
     }
+
     
     // 获取默认教学楼列表
     private func getDefaultBuildings(forCampus campusId: String) -> [Building] {
         switch campusId {
-        case "1":
+        case "00002":
             return Constants.OptionData.mainCampusBuildings
-        case "2":
+        case "00005":
             return Constants.OptionData.shungengCampusBuildings
-        case "3":
-            return Constants.OptionData.mingshuiCampusBuildings
         default:
             return Constants.OptionData.mainCampusBuildings
         }

@@ -143,7 +143,7 @@ class ClassroomService {
             // 获取HTML页面
             let html = try await NetworkService.shared.getHtml(path: "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
             
-            // 从HTML中提取校区选项 - 使用正则表达式
+            // 从HTML中提取校区选项
             let pattern = "<option[^>]*value=['\"]([^'\"]+)['\"][^>]*>([^<]+)</option>"
             let regex = try NSRegularExpression(pattern: pattern, options: [])
             
@@ -314,7 +314,6 @@ class ClassroomService {
             let isSessionValid = await validateSession()
             if !isSessionValid {
                 print("会话无效，返回默认教学楼列表")
-                // 返回默认教学楼列表
                 return getDefaultBuildings(forCampus: campusId)
             }
             
@@ -383,7 +382,7 @@ class ClassroomService {
         // 获取HTML页面
         let html = try await NetworkService.shared.getHtml(path: "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
         
-        // 从HTML中提取教学楼选项 - 使用正则表达式
+        // 从HTML中提取教学楼选项
         let pattern = "<option[^>]*value=['\"]([^'\"]+)['\"][^>]*>([^<]+)</option>"
         let regex = try NSRegularExpression(pattern: pattern, options: [])
         
@@ -434,12 +433,10 @@ class ClassroomService {
     // 获取默认教学楼列表的辅助方法
     private func getDefaultBuildings(forCampus campusId: String) -> [Building] {
         switch campusId {
-        case "1":
+        case "00002":
             return Constants.OptionData.mainCampusBuildings
-        case "2":
+        case "00005":
             return Constants.OptionData.shungengCampusBuildings
-        case "3":
-            return Constants.OptionData.mingshuiCampusBuildings
         default:
             return Constants.OptionData.mainCampusBuildings
         }
@@ -460,7 +457,7 @@ class ClassroomService {
             // 获取HTML页面
             let html = try await NetworkService.shared.getHtml(path: "cdjy/cdjy_cxKxcdlb.html?gnmkdm=N2155")
             
-            // 从HTML中提取场地类别选项 - 使用正则表达式
+            // 从HTML中提取场地类别选项
             let pattern = "<option[^>]*value=['\"]([^'\"]+)['\"][^>]*>([^<]+)</option>"
             let regex = try NSRegularExpression(pattern: pattern, options: [])
             

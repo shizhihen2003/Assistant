@@ -144,9 +144,9 @@ struct QueryFormView: View {
                         viewModel.onTermChanged()
                     }
                     
-                    // 校区选择
+                    // 校区选择器
                     Picker("校区", selection: $viewModel.selectedCampus) {
-                        ForEach(Constants.OptionData.campuses) { campus in
+                        ForEach(viewModel.campusList) { campus in
                             Text(campus.name).tag(campus)
                         }
                     }
@@ -154,16 +154,16 @@ struct QueryFormView: View {
                         viewModel.onCampusChanged()
                     }
                     
-                    // 教学楼选择
+                    // 教学楼选择器
                     Picker("教学楼", selection: $viewModel.selectedBuilding) {
                         ForEach(viewModel.buildings) { building in
                             Text(building.name).tag(building)
                         }
                     }
                     
-                    // 场地类别选择
+                    // 场地类别选择器
                     Picker("场地类别", selection: $viewModel.selectedRoomType) {
-                        ForEach(Constants.OptionData.roomTypes) { roomType in
+                        ForEach(viewModel.roomTypes) { roomType in
                             Text(roomType.name).tag(roomType)
                         }
                     }
