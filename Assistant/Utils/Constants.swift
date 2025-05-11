@@ -115,7 +115,7 @@ struct Constants {
             Weekday(id: "7", name: "星期日")
         ]
         
-        // 节次选项
+        // 节次选项 - 修改为10节
         static let periods = [
             Period(id: "1", name: "第1节"),
             Period(id: "2", name: "第2节"),
@@ -126,9 +126,7 @@ struct Constants {
             Period(id: "7", name: "第7节"),
             Period(id: "8", name: "第8节"),
             Period(id: "9", name: "第9节"),
-            Period(id: "10", name: "第10节"),
-            Period(id: "11", name: "第11节"),
-            Period(id: "12", name: "第12节")
+            Period(id: "10", name: "第10节")
         ]
         
         // 主校区默认教学楼

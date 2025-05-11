@@ -16,8 +16,7 @@ class ClassroomViewModel: ObservableObject {
     @Published var selectedRoomType: RoomType = Constants.OptionData.roomTypes[0]
     @Published var selectedWeek: Week = Constants.OptionData.weeks[0]
     @Published var selectedWeekday: Weekday = Constants.OptionData.weekdays[0]
-    @Published var selectedStartPeriod: Period = Constants.OptionData.periods[0]
-    @Published var selectedEndPeriod: Period = Constants.OptionData.periods[1]
+    @Published var selectedPeriods: [String] = []  // 选中的节次ID数组
     
     // 下拉选项数据
     @Published var terms: [Term] = Constants.OptionData.defaultTerms()
@@ -70,10 +69,8 @@ class ClassroomViewModel: ObservableObject {
             selectedWeek = Constants.OptionData.weeks[currentWeek - 1]
         }
         
-        // 设置默认结束节次为第2节
-        if Constants.OptionData.periods.count >= 2 {
-            selectedEndPeriod = Constants.OptionData.periods[1]
-        }
+        // 设置默认选中的节次 (默认选择第1和第2节)
+        selectedPeriods = ["1", "2"]
         
         // 先加载保存的Cookie
         NetworkService.shared.loadCookiesFromStorage()
@@ -101,6 +98,20 @@ class ClassroomViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    // 节次选择/取消的方法
+    func togglePeriodSelection(_ periodId: String) {
+        if selectedPeriods.contains(periodId) {
+            selectedPeriods.removeAll { $0 == periodId }
+        } else {
+            selectedPeriods.append(periodId)
+        }
+    }
+    
+    // 清空选中的节次
+    func clearPeriodSelection() {
+        selectedPeriods = []
     }
     
     // 加载上次选择的参数
@@ -342,8 +353,8 @@ class ClassroomViewModel: ObservableObject {
     // 查询空教室
     func queryEmptyClassrooms() {
         // 验证参数
-        if Int(selectedStartPeriod.id) ?? 0 > Int(selectedEndPeriod.id) ?? 0 {
-            self.errorMessage = "开始节次不能大于结束节次"
+        if selectedPeriods.isEmpty {
+            self.errorMessage = "请至少选择一个节次"
             self.showError = true
             return
         }
@@ -356,8 +367,7 @@ class ClassroomViewModel: ObservableObject {
             jxlh: selectedBuilding.id.isEmpty ? nil : selectedBuilding.id,
             cdlb_id: selectedRoomType.id.isEmpty ? nil : selectedRoomType.id,
             qssd: selectedWeekday.id,
-            qsjc: selectedStartPeriod.id,
-            jsjc: selectedEndPeriod.id,
+            selectedPeriods: selectedPeriods,
             zcd: classroomService.generateWeekString(weekId: selectedWeek.id)
         )
         

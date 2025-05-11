@@ -186,33 +186,37 @@ struct QueryFormView: View {
                             Text(weekday.name).tag(weekday)
                         }
                     }
+                }
+                
+                // 节次多选部分 (新增)
+                Section(header: Text("选择节次")) {
+                    let columns = [
+                        GridItem(.adaptive(minimum: 60))
+                    ]
                     
-                    // 起始节次与结束节次
-                    HStack {
-                        Text("节次")
-                        Spacer()
-                        
-                        // 选择器组
-                        HStack(spacing: 4) {
-                            Picker("", selection: $viewModel.selectedStartPeriod) {
-                                ForEach(Constants.OptionData.periods) { period in
-                                    Text(period.name).tag(period)
-                                }
+                    LazyVGrid(columns: columns, spacing: 8) {
+                        ForEach(Constants.OptionData.periods) { period in
+                            Button(action: {
+                                viewModel.togglePeriodSelection(period.id)
+                            }) {
+                                Text(period.name.replacingOccurrences(of: "第", with: "").replacingOccurrences(of: "节", with: ""))
+                                    .font(.system(.body, design: .rounded))
+                                    .frame(minWidth: 44, minHeight: 44)
+                                    .background(viewModel.selectedPeriods.contains(period.id) ? Color.blue : Color.gray.opacity(0.15))
+                                    .foregroundColor(viewModel.selectedPeriods.contains(period.id) ? .white : .primary)
+                                    .cornerRadius(8)
                             }
-                            .frame(width: 120)
-                            .clipped()
-                            
-                            Text("至")
-                                .foregroundColor(.secondary)
-                            
-                            Picker("", selection: $viewModel.selectedEndPeriod) {
-                                ForEach(Constants.OptionData.periods) { period in
-                                    Text(period.name).tag(period)
-                                }
-                            }
-                            .frame(width: 120)
-                            .clipped()
+                            .buttonStyle(PlainButtonStyle())
                         }
+                    }
+                    .padding(.vertical, 4)
+                    
+                    if !viewModel.selectedPeriods.isEmpty {
+                        Button("清空选择") {
+                            viewModel.clearPeriodSelection()
+                        }
+                        .font(.caption)
+                        .foregroundColor(.blue)
                     }
                 }
                 
@@ -236,7 +240,6 @@ struct QueryFormView: View {
                     .disabled(viewModel.isLoading)
                 }
             }
-            .frame(height: 380)
             
             // 上次查询条件显示
             if formSubmitted && !isShowingForm && !viewModel.classrooms.isEmpty {
@@ -255,6 +258,21 @@ struct QueryFormView: View {
 struct QuerySummaryBar: View {
     @EnvironmentObject var viewModel: ClassroomViewModel
     var showFormAction: () -> Void
+    
+    // 格式化选中节次
+    private var formattedPeriods: String {
+        if viewModel.selectedPeriods.isEmpty {
+            return "未选择节次"
+        }
+        
+        let sortedPeriods = viewModel.selectedPeriods
+            .compactMap { Int($0) }
+            .sorted()
+            .map { String($0) }
+            .joined(separator: ",")
+        
+        return "第\(sortedPeriods)节"
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -276,7 +294,7 @@ struct QuerySummaryBar: View {
                     Text("·")
                         .foregroundColor(.secondary)
                     
-                    Text("第\(viewModel.selectedStartPeriod.id)-\(viewModel.selectedEndPeriod.id)节")
+                    Text(formattedPeriods)
                         .font(.footnote)
                         .fontWeight(.medium)
                     

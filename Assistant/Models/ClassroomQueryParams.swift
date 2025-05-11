@@ -15,8 +15,7 @@ struct ClassroomQueryParams: Codable {
     var jxlh: String?  // 教学楼ID
     var cdlb_id: String?  // 场地类别
     var qssd: String  // 起始时间（周几）
-    var qsjc: String  // 起始节次
-    var jsjc: String  // 结束节次
+    var selectedPeriods: [String]  // 选中的节次ID数组
     var zcd: String  // 周次
     var queryModel: QueryModel
     
@@ -34,15 +33,14 @@ struct ClassroomQueryParams: Codable {
             }
         }
         
-        init(xnm: String, xqm: String, xqh_id: String, jxlh: String? = nil, cdlb_id: String? = nil, qssd: String, qsjc: String, jsjc: String, zcd: String) {
+        init(xnm: String, xqm: String, xqh_id: String, jxlh: String? = nil, cdlb_id: String? = nil, qssd: String, selectedPeriods: [String], zcd: String) {
             self.xnm = xnm
             self.xqm = xqm
             self.xqh_id = xqh_id
             self.jxlh = jxlh
             self.cdlb_id = cdlb_id
             self.qssd = qssd
-            self.qsjc = qsjc
-            self.jsjc = jsjc
+            self.selectedPeriods = selectedPeriods
             self.zcd = zcd
             self.queryModel = QueryModel()
         }
@@ -53,18 +51,25 @@ struct ClassroomQueryParams: Codable {
                 "xnm": xnm,
                 "xqm": xqm,
                 "xqh_id": xqh_id,
-                "qssd": qssd,             // 星期几
-                "qsjc": qsjc,             // 开始节次
-                "jsjc": jsjc,             // 结束节次
+                "xqj": qssd,             // 修改: 将qssd映射为xqj(星期几)
+                "fwzt": "cx",             // 服务状态：查询
+                "jyfs": "0",              // 借用方式：按周次借用
                 "zcd": zcd,               // 周次
-                "fwzt": "cx",             // 服务状态：查询 (添加这个参数)
-                "jyfs": "0",              // 借用方式：按周次借用 (添加这个参数)
                 "queryModel.showCount": queryModel.showCount,
                 "queryModel.currentPage": queryModel.currentPage
             ]
             
+            // 计算选中节次的二进制表示
+            var jcd = 0
+            for periodId in selectedPeriods {
+                if let periodNum = Int(periodId) {
+                    jcd += (1 << (periodNum - 1))
+                }
+            }
+            params["jcd"] = "\(jcd)"  // 添加节次的二进制编码
+            
             if let jxlh = jxlh, !jxlh.isEmpty {
-                params["jxlh"] = jxlh
+                params["lh"] = jxlh       // 修改: 将jxlh映射为lh(教学楼)
             }
             
             if let cdlb_id = cdlb_id, !cdlb_id.isEmpty {

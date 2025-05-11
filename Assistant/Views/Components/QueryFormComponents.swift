@@ -147,11 +147,68 @@ struct WeekSelectorView: View {
     }
 }
 
+// 新增: 节次多选组件
+struct PeriodsSelectView: View {
+    @Binding var selectedPeriods: [String]
+    var periods: [Period]
+    
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+    ]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("选择节次")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedPeriods = []
+                }) {
+                    Text("清空")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                }
+            }
+            
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(periods) { period in
+                    Button(action: {
+                        togglePeriodSelection(period.id)
+                    }) {
+                        Text(period.name.replacingOccurrences(of: "第", with: "").replacingOccurrences(of: "节", with: ""))
+                            .font(.system(.body, design: .rounded))
+                            .frame(minWidth: 0, maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(selectedPeriods.contains(period.id) ? Color.blue : Color.gray.opacity(0.15))
+                            .foregroundColor(selectedPeriods.contains(period.id) ? .white : .primary)
+                            .cornerRadius(8)
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+        }
+    }
+    
+    private func togglePeriodSelection(_ periodId: String) {
+        if selectedPeriods.contains(periodId) {
+            selectedPeriods.removeAll { $0 == periodId }
+        } else {
+            selectedPeriods.append(periodId)
+        }
+    }
+}
+
 // 自定义星期和节次选择组件
 struct TimeSelectView: View {
     @Binding var selectedWeekday: Weekday
-    @Binding var selectedStartPeriod: Period
-    @Binding var selectedEndPeriod: Period
+    @Binding var selectedPeriods: [String]
     var weekdays: [Weekday]
     var periods: [Period]
     
@@ -184,36 +241,11 @@ struct TimeSelectView: View {
             }
             .padding(.vertical, 4)
             
-            // 节次选择
-            HStack {
-                Text("节次")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(width: 50, alignment: .leading)
-                
-                Picker("开始", selection: $selectedStartPeriod) {
-                    ForEach(periods) { period in
-                        Text(period.name).tag(period)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 80)
-                
-                Text("至")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Picker("结束", selection: $selectedEndPeriod) {
-                    ForEach(periods) { period in
-                        Text(period.name).tag(period)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 80)
-                
-                Spacer()
-            }
-            .padding(.vertical, 4)
+            // 节次选择 - 改为新组件
+            PeriodsSelectView(
+                selectedPeriods: $selectedPeriods,
+                periods: periods
+            )
         }
     }
 }
